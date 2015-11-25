@@ -63,7 +63,7 @@ if(boolMe){
 		std::cout<<pow(10,z)<<" "<<washout(1,M/(pow(10,z)),M)<<std::endl;
 	}*/
 
-	struct dispParams params = {1e11,0.7e11,2e12,3e12};
+	struct dispParams params = {1e11,4e11,2e12,3e12};
 /*	for(double x = 10; x<14; x=x+0.0101)
 	{
 //		std::cout<<pow(10,x)<<" "<<TRKS_integrand(pow(10,x),&params)<<TRUS_integrand(pow(10,x),&params)<<std::endl;
@@ -75,13 +75,26 @@ if(boolMe){
 	std::cout<<"# disp : "<<dispSolved(1.2e12,params)<<std::endl;*/
 
 	
-	struct dispParams params2={1e11,0.9e11,2e12,3e12};
-	struct dispParams params3={1e11,1e11,2e12,3e12};
-	struct dispParams params4={1e11,1.2e11,2e12,3e12};
-	struct dispParams params5={1e11,1.5e11,2e12,3e12};
-	struct dispParams params6={1e11,2e11,2e12,3e12};
+	struct dispParams params2={1e11,6e11,2e12,3e12};
+	struct dispParams params3={1e11,8e11,2e12,3e12};
+	struct dispParams params4={1e11,10e11,2e12,3e12};
+	struct dispParams params5={1e11,12e11,2e12,3e12};
+	struct dispParams params6={1e11,20e11,2e12,3e12};
 
-	for(double x = 0.05*params.T; x<params.T; x=x+0.01*params.T)
+	for(double x = -1; x<3; x=x+0.033)
+	{
+		double k = dispSolved(pow(10,x)*params.T,params);
+		double kB= dispSolved(pow(10,x)*params.T,params2);
+		double kC = dispSolved(pow(10,x)*params.T,params3);
+		double kD = dispSolved(pow(10,x)*params.T,params4);
+		double ke = dispSolved(pow(10,x)*params.T,params5);
+		double kf = dispSolved(pow(10,x)*params.T,params6);
+		double kz = pow(10,x)*params.T;
+//		std::cout<<pow(10,x)<<" "<<TRKS_integrand(pow(10,x),&params)<<TRUS_integrand(pow(10,x),&params)<<std::endl;
+		std::cout<<kz/params.T<<" "<<(k-kz)/params.T<<"  "<<(kB-kz)/params.T<<"  "<<(kC-kz)/params.T<<" "<<(kD-kz)/params.T<<" "<<(ke-kz)/params.T<<"  "<<(kf-kz)/params.T<<std::endl;
+	}
+
+/*	for(double x = 0.06*params.T; x<params.T; x=x+0.005*params.T)
 	{
 		double k = dispSolved(x,params);
 		double kB= dispSolved(x,params2);
@@ -93,7 +106,7 @@ if(boolMe){
 //		std::cout<<pow(10,x)<<" "<<TRKS_integrand(pow(10,x),&params)<<TRUS_integrand(pow(10,x),&params)<<std::endl;
 		std::cout<<kz/params.T<<" "<<(k-kz)/params.T<<"  "<<(kB-kz)/params.T<<"  "<<(kC-kz)/params.T<<" "<<(kD-kz)/params.T<<" "<<(ke-kz)/params.T<<"  "<<(kf-kz)/params.T<<std::endl;
 	}
-
+*/
 
 } else {
 	/*double T = 1e12;
