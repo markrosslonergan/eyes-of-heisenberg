@@ -1,5 +1,5 @@
 #ifndef WASHOUT_H_
-#define WASHOUt_H_
+#define WASHOUT_H_
 
 #include <vector>
 #include <cmath>
