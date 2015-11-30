@@ -38,6 +38,9 @@ int whatsthatsign(double x){
 return 0;
 }
 
+
+
+
 double LpB(double p, double M, double k0, double k1){
 
 	double top = pow(-k1*k1+k0*k0-M*M,2)+4*k1*(-k1*k1+k0*k0-M*M)*p - 4*(-k1*k1+k0*k0)*p*p;
@@ -155,7 +158,9 @@ double dispSolved(double w0, struct dispParams p){
 	int iter = 0, max_iter =250;
 	int status;
 	double r = 0;
-
+	
+	// INitialise gsl root solving algorithm, going to use brent as its a brackeing algorithm that as long as we get a point on either sie, is guarrenteed to
+	// find the contained root.
 	const gsl_root_fsolver_type * T   = gsl_root_fsolver_brent;
 	gsl_root_fsolver * s     = gsl_root_fsolver_alloc (T);
 	//const gsl_root_fdfsolver_type * T   = gsl_root_fdfsolver_newton;
@@ -164,7 +169,8 @@ double dispSolved(double w0, struct dispParams p){
 
 	p.k0=w0;
 
-	
+	//This for loop will start a bit to the left and roight of input k0 and increas:e the bracket until we get opposite signs
+	//Will only fail if its all negative or positive, which can happen at very low k/T (presumably due to not complete expressions)
 	double x_lo=w0;
 	double x_hi=w0;
 	
@@ -184,6 +190,8 @@ double dispSolved(double w0, struct dispParams p){
 		x_lo=std::min(w0*pow(10,-m),w0*pow(10,m));
 		x_hi=std::max(w0*pow(10,-m),w0*pow(10,m));
 
+
+	//Same as with integration, we need to set it up in terms of a gsl_function F .
 	gsl_function F;
 	F.function =&dispEquation;
 	F.params =&p;
@@ -191,7 +199,8 @@ double dispSolved(double w0, struct dispParams p){
 	gsl_root_fsolver_set(s,&F,x_lo,x_hi);
 	
 
-
+	//This is the actuall iteration, each step check to see if we have converged enough (or max iterations have been found)
+	// In general dont really need much iterations, very efficient algorithm
 	do
 	{
 		iter++;
@@ -203,7 +212,9 @@ double dispSolved(double w0, struct dispParams p){
 	}
 	while (status == GSL_CONTINUE && iter < max_iter);
 
-	gsl_root_fsolver_free (s);
+	// Always free your fsolver for memory reasons
+	gsl_root_fsolver_free (s); 
+
 
 	return r;
 
