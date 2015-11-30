@@ -4,7 +4,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <nlopt.hpp>
 #include <iomanip>
 #include <sys/time.h>
 #include <gsl/gsl_sf_dilog.h>
@@ -13,7 +12,7 @@
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_errno.h>
 //#include <gsl/pow.h>
-
+// hello there!
 #include "dispersion.h"
 
 #define GW 2.0
