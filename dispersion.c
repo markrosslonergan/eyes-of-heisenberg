@@ -24,8 +24,10 @@
 
 
 double nB(double p, double T){
+double ans = 0.0;
+if(p < 1e4*T){ans=1.0/(exp(p/T)-1.0);}
 
-return 1.0/(exp(p/T)-1.0);
+return ans;
 }
 
 /*
@@ -148,7 +150,9 @@ double dispEquation(double w1, void * d){
 	double k0 = params->k0;
 	params->k1=w1;
 
-	return (1-sigmaA(*params))*k0-sigmaB(*params)-(1-sigmaA(*params))*w1;
+	
+	//return (1-sigmaA(*params))*k0-sigmaB(*params)-(1-sigmaA(*params))*w1;
+	return (1+sigmaA(*params))*k0+sigmaB(*params)-(1+sigmaA(*params))*w1;
 
 }
 

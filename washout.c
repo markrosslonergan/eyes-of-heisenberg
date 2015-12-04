@@ -17,6 +17,8 @@
 #define PI 3.14149
 #define REL 0.01
 #define ABS 0
+#define DEBUG_MODE false
+#define T_TRESHOLD 1e-12
 
 double washout_integrand (double x,  void * p) {
 	struct washoutParams * params  = (struct washoutParams *)p;
@@ -42,7 +44,17 @@ double washout(double eta,double T, double M)
 	F.function = &washout_integrand;
 	F.params = &params;
 	
-	gsl_integration_qags(&F,0.0, 50, ABS, REL, 5000, w, &result, &error); 
+	
+	double base = washout_integrand(T,&params);
+	double iT = 2;
+
+	for(iT=2;fabs(washout_integrand(iT*T,&params)/base)>=T_TRESHOLD;iT=iT+1) 
+	{
+		if(DEBUG_MODE){	std::cout<<std::setprecision(9)<<"# washout integral base "<<base<<" iT: "<<iT<<" rat:  "<<fabs(washout_integrand(iT*T,&params)/base)<<std::endl;}
+	}
+
+
+	gsl_integration_qags(&F,0.0, iT*T, ABS, REL, 5000, w, &result, &error); 
 	gsl_integration_workspace_free (w);
 
 	return -3*Y1*Y1*M*M*eta/(8*PI*PI*PI*T)*result;

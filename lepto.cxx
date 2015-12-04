@@ -76,7 +76,7 @@ if(boolMe){
 
 	
 	struct dispParams params2={1e11,6e11,2e12,3e12};
-	struct dispParams params3={1e11,8e11,2e12,3e12};
+	struct dispParams params3={1e11,0.5e11,2e12,3e12};
 	struct dispParams params4={1e11,10e11,2e12,3e12};
 	struct dispParams params5={1e11,12e11,2e12,3e12};
 	struct dispParams params6={1e11,20e11,2e12,3e12};
@@ -91,7 +91,10 @@ if(boolMe){
 		double kf = dispSolved(pow(10,x)*params.T,params6);
 		double kz = pow(10,x)*params.T;
 //		std::cout<<pow(10,x)<<" "<<TRKS_integrand(pow(10,x),&params)<<TRUS_integrand(pow(10,x),&params)<<std::endl;
-		std::cout<<kz/params.T<<" "<<(k-kz)/params.T<<"  "<<(kB-kz)/params.T<<"  "<<(kC-kz)/params.T<<" "<<(kD-kz)/params.T<<" "<<(ke-kz)/params.T<<"  "<<(kf-kz)/params.T<<std::endl;
+	//	std::cout<<kz/params.T<<" "<<(k-kz)/params.T<<"  "<<(kB-kz)/params.T<<"  "<<(kC-kz)/params.T<<" "<<(kD-kz)/params.T<<" "<<(ke-kz)/params.T<<"  "<<(kf-kz)/params.T<<std::endl;
+		std::cout<<kC/params.T<<"  "<<(kz-kC)/params.T<<std::endl;
+
+
 	}
 
 /*	for(double x = 0.06*params.T; x<params.T; x=x+0.005*params.T)
