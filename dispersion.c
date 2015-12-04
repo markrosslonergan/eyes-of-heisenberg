@@ -27,7 +27,7 @@
 
 double nB(double p, double T){
    double ans = 0.0;
-    if (p < 1e5*T){ ans = 1.0/(exp(p/T)-1.0);}
+    if (p < 1e8*T){ ans = 1.0/(exp(p/T)-1.0);}
     
     return ans;
 }
@@ -36,8 +36,8 @@ double nB(double p, double T){
 
 double nF(double p, double T, double M){
     double ans = 0.0;
-    if (sqrt(p*p+M*M) < 1e5*T){ ans = 1.0/(exp(sqrt(p*p+M*M)/ T)+1.0);}
-    
+    //if (sqrt(p*p+M*M) < 1e5*T){ ans = 1.0/(exp(sqrt(p*p+M*M)/ T)+1.0);}
+    ans =1.0/(exp(sqrt(p*p+M*M)/T)+1.0); 
     return ans;
 
 }
@@ -170,6 +170,48 @@ double TRUS(double T, double M,double k0, double k1)
 
 }
 
+double TRS_integrand(double p, void*d){
+	
+	struct dispParams * params = (struct dispParams *)d;
+	double M = params->M;
+	double k1 = params->k1;
+	double k0 = params->k0;
+	double T = params->T;
+
+
+	return -1.0/(4.0*PI*PI)*p/k1*(1.0/k0*nF(p,T,M)*LpF(p,M,k0,k1)-1.0/p*nB(p,T)*LpB(p,M,k0,k1));
+
+
+}
+
+double TRS(double T,double M,double k0,double k1)
+{
+
+    
+	gsl_integration_workspace * w = gsl_integration_workspace_alloc (5000);
+	struct dispParams params = {T,M,k0,k1};
+	double result,error;
+	gsl_function F;
+	F.function = &TRS_integrand;
+	F.params = &params;
+	
+	double base = TRS_integrand(T,&params);
+	double iT = 2;
+
+	for(iT=2;fabs(TRS_integrand(iT*T,&params)/base)>=T_TRESHOLD;iT=iT+1)
+	  {
+	 // if(DEBUG_MODE){	std::cout<<std::setprecision(9)<<"# TRKU integral base "<<base<<" iT: "<<iT<<" rat:  "<<fabs(TRUS_integrand(iT*T,&params)/base)<<std::endl;}
+		}
+    //std::cout << "now: " << iT << std::endl;
+	gsl_integration_qags(&F,0.0, iT*T, ABS, REL, 5000, w, &result, &error);
+	gsl_integration_workspace_free (w);
+
+	return result;
+
+}
+
+
+
 double sigmaA(double T, double M, double k0, double k1){
 	return 1/(k1*k1)*(TRKS(T,M,k0,k1)-k0*TRUS(T,M,k0,k1));
 }
@@ -179,19 +221,23 @@ double sigmaB(double T, double M, double k0, double k1){
 	return (pow(k0/k1,2)-1)*TRUS(T,M,k0,k1)-(k0/pow(k1,2))*TRKS(T,M,k0,k1);
    }
 
+double sigmaC(double T, double M, double k0, double k1){
+	return TRS(T,M,k0,k1);
+}
 
 //opposite now, put in k0 get k1
 double dispEquation(double k0, void * d){
 	struct dispParams2 * params = (struct dispParams2 *)d;
 	double T = params->T;
 	double M = params->M;
-    double k1 = params->k1;
+        double k1 = params->k1;
     
     
         //if(DEBUG_MODE){std::cout<<"sigma"<<" "<<(1+sigmaA(*params))*k0+sigmaB(*params)+(1+sigmaA(*params))*w1<<std::endl;}
          // double ans_pos = (1+sigmaA(*params))*w0+sigmaB(*params)+(1+sigmaA(*params))*k1;
-          double ans_neg = (1+sigmaA(T,M,k0,k1))*k0+sigmaB(T,M,k0,k1)-(1+sigmaA(T,M,k0,k1))*k1;
-    return ans_neg;
+         // double ans_neg = (1+sigmaA(T,M,k0,k1))*k0+sigmaB(T,M,k0,k1)-(1+sigmaA(T,M,k0,k1))*k1;
+	  double ans_mass= (1+sigmaA(T,M,k0,k1))*k0+sigmaB(T,M,k0,k1)-sqrt(pow(k1*(1.0+sigmaA(T,M,k0,k1)),2)+pow(M*(1-sigmaC(T,M,k0,k1)),2) );
+   	 return ans_mass;
    // return ans_pos;
 
 }

@@ -27,10 +27,14 @@ double TRKS_integrand(double p, void *d);
 double TRKS(double T, double M,double k0, double k1);
 double TRUS_integrand(double p, void *d);
 double TRUS(double T, double M,double k0, double k1);
+double TRS_integrand(double p, void *d);
+double TRS(double T,double M,double k0,double k1);
+
 
 double sigmaA(double T, double M, double k0, double k1);
 double sigmaB(double T, double M, double k0, double k1);
-double dispEquation(double k1, void * d);
+double sigmaC(double T, double M, double k0, double k1);
+double dispEquation(double k0, void * d);
 double dispSolved(double T, double M, double k1);
 
 std::vector<double > plotDispersion(double M,double T,double kmin, double kmax);
