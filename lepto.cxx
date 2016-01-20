@@ -108,10 +108,12 @@ if(test_mode){
 	
 	for(int i =0; i< list_mot.size();i++){
 
+		// Ok do some redundent variable counting, anything with an i in front iterates
 		double iMoT=list_mot[i];
 		double iT=1;
 		double iM = iMoT*iT;
 
+		//some strings to handle filenaming, and stream for file
 		std::stringstream str; str.str(std::string()); str.clear();
        		std::ofstream myfile;
 		
@@ -126,6 +128,7 @@ if(test_mode){
 		}
 		str<<".dat";
 
+		//Open said file
 		myfile.open(str.str().c_str());
 	
 		std::cout<<"Starting M/T of : "<<iM/iT<<" to tests/dispersion_test/*.dat"<<std::endl;
@@ -134,16 +137,24 @@ if(test_mode){
 		{	
 			double k1 = k1oT*iT;
 		        double found_k0 = dispSolved(iT, iM, k1, use_c, use_nf);
-
+			//loop over the above K1/T values and output to apprioiate file
         		myfile<<fabs(k1oT)<<" "<<(found_k0-fabs(k1))/iT<<std::endl;
 		}
 
-
+		//close that version of file
 		myfile.close();
 	}
-
+		//Gnuplot plotting script.
 		std::cout<<"Running gnuplot script to plot tests/dispersion_test/dispersion_plot.png"<<std::endl;
-		system("./tests/dispersion_test/plot_dispersion.sh");
+		if(use_c && !use_nf){
+			system("./tests/dispersion_test/plot_dispersion_wc.sh");
+		}else if(use_nf && !use_c){
+			system("./tests/dispersion_test/plot_dispersion_wnf.sh");
+		}else if(use_c &&use_nf){
+			system("./tests/dispersion_test/plot_dispersion_wc_wnf.sh");
+		} else {
+			system("./tests/dispersion_test/plot_dispersion.sh");
+		}
 		std::cout<<"Done!"<<std::endl;
 
 
