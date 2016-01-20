@@ -31,6 +31,7 @@ bool boolDisp = false;
 bool use_nf = false;
 bool use_c = false;
 bool test_mode = false;
+bool testDisp = false;
 /******************************************************************
  *
  *	Main Flag seperation switch statement, run -h for options
@@ -39,7 +40,7 @@ bool test_mode = false;
  */
 
 	int c;
-	while ((c = getopt (argc, argv, "DM:T:-:")) != -1)
+	while ((c = getopt (argc, argv, "KDM:T:-:")) != -1)
    	{ 
 	switch (c) 
       	{
@@ -51,6 +52,9 @@ bool test_mode = false;
 			break;
 		case 'D':
 			boolDisp=true;
+			break;
+		case 'K':
+			testDisp = true;
 			break;
 		case '-':
 			if(!strcmp(optarg,"dispersion"))
@@ -132,13 +136,14 @@ if(test_mode){
 		myfile.open(str.str().c_str());
 	
 		std::cout<<"Starting M/T of : "<<iM/iT<<" to tests/dispersion_test/*.dat"<<std::endl;
-	
-        	for(double k1oT = 1.0;k1oT > 0.02 ; k1oT=k1oT-0.0101)
+		double init = 0.5;	
+        	for(double k1oT = 0.5;k1oT > 0.01 ; k1oT=k1oT-0.0101)
 		{	
 			double k1 = k1oT*iT;
-		        double found_k0 = dispSolved(iT, iM, k1, use_c, use_nf);
+		        double found_k0 = dispSolved(iT, iM, k1,init, use_c, use_nf);
 			//loop over the above K1/T values and output to apprioiate file
         		myfile<<fabs(k1oT)<<" "<<(found_k0-fabs(k1))/iT<<std::endl;
+			init = found_k0;
 		}
 
 		//close that version of file
@@ -179,8 +184,27 @@ if(test_mode){
 	plot_disp(T,M,use_c,use_nf,kmin,kmax);
 
 
-} else {
+} else if(testDisp){
 
+	// Going to output everything! for a single M/T and snaps of k1/T 
+
+	std::vector<double > snaps = {0.3,0.2,0.15,0.125,0.1,0.075,0.05,0.025};
+	std::vector<struct dispParams2> vec_struct (snaps.size());
+	for(int i =0; i< snaps.size(); i++){
+		vec_struct[i] = {T,M,snaps[i],use_c,use_nf};
+	}
+    	
+	for(double ik0=0.5; ik0>0.01;ik0=ik0-0.01013101){
+		
+    		
+		std::cout<<ik0/T<<" ";
+			for(int i =0; i< snaps.size(); i++){
+				std::cout<<dispEquation(ik0,&(vec_struct[i]) )<<" ";
+			}
+		std::cout<<std::endl;
+	}
+
+}else{
 
 
 	//for(double z = -2; z<1; z=z+0.05){

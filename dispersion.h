@@ -41,9 +41,9 @@ double sigmaB(double T, double M, double k0, double k1, bool use_nf);
 double sigmaC(double T, double M, double k0, double k1, bool use_nf);
 double dispEquation(double k0, void * d);
 double dispEquationN(double k0, void * d);
-double dispSolved(double T, double M, double k1,bool use_c, bool use_nf);
+double dispSolved(double T, double M, double k1,double init,bool use_c, bool use_nf);
 
-double plot_disp(double M, double T, bool use_c, bool use_nf, double k1oT_min, double k1oT_max);
+double plot_disp(double T, double M, bool use_c, bool use_nf, double k1oT_min, double k1oT_max);
 
 
 #endif

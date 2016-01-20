@@ -486,7 +486,7 @@ double dispEquationN(double k0, void * d){
 
 }
 
-double dispSolved(double T, double M, double k1, bool use_c, bool use_nf){
+double dispSolved(double T, double M, double k1, double init, bool use_c, bool use_nf){
 
 	int iter = 0, max_iter = 250;
    	int status;
@@ -501,15 +501,15 @@ double dispSolved(double T, double M, double k1, bool use_c, bool use_nf){
 	//This for loop will start a bit to the left and roight of input k0 and increas:e the bracket until we get opposite signs
 	//Will only fail if its all negative or positive, which can happen at very low k/T (presumably due to not complete expressions)
 	
-	double x_lo=k1;
-	double x_hi=k1;
+	double x_lo=init;
+	double x_hi=init;
 	
 
 	double m = 1e-8;
-    for(m = 1e-6; whatsthatsign(dispEquation(k1*pow(10,m),&p))==whatsthatsign(dispEquation(k1*pow(10,-m),&p)); m=m+0.005)
+    for(m = 1e-6; whatsthatsign(dispEquation(init*pow(10,m),&p))==whatsthatsign(dispEquation(init*pow(10,-m),&p)); m=m+0.0005)
    	{
-        if(DEBUG_MODE){std::cout<<m<<" "<<pow(10,m)<<" "<<whatsthatsign(dispEquation(k1*pow(10,m),&p))<<" "<<whatsthatsign(dispEquation(k1*pow(10,-m),&p))<<std::endl;}
-        if(DEBUG_MODE){std::cout<<m<<" "<<pow(10,m)<<" "<<dispEquation(k1*pow(10,m),&p)<<" "<<-m<<" "<<pow(10,-m)<<" "<<dispEquation(k1*pow(10,-m),&p)<<std::endl;}
+  //        if(DEBUG_MODE){std::cout<<m<<" "<<pow(10,m)<<" "<<whatsthatsign(dispEquation(k1*pow(10,m),&p))<<" "<<whatsthatsign(dispEquation(k1*pow(10,-m),&p))<<std::endl;}
+  //      if(DEBUG_MODE){std::cout<<m<<" "<<pow(10,m)<<" "<<dispEquation(k1*pow(10,m),&p)<<" "<<-m<<" "<<pow(10,-m)<<" "<<dispEquation(k1*pow(10,-m),&p)<<std::endl;}
 		if(m>4)
 		{
 		//	std::cout<<"# ERROR: dispSolved@'dispersion.c' rootfinder: Wandered from k0, didnt bracket the root. "<<std::endl;
@@ -517,8 +517,8 @@ double dispSolved(double T, double M, double k1, bool use_c, bool use_nf){
 	
 	}
 		//std::cout<<m*multiplier<<" "<<dispEquation(w0*(m*multiplier),&p)<<" "<<dispEquation(w0/(m*multiplier),&p)<<std::endl;
-		x_lo=std::min(k1*pow(10,-m),k1*pow(10,m));
-		x_hi=std::max(k1*pow(10,-m),k1*pow(10,m));
+		x_lo=std::min(init*pow(10,-m),init*pow(10,m));
+		x_hi=std::max(init*pow(10,-m),init*pow(10,m));
 
 
 	//Same as with integration, we need to set it up in terms of a gsl_function F .
@@ -554,15 +554,17 @@ double dispSolved(double T, double M, double k1, bool use_c, bool use_nf){
 }
 
 
-double plot_disp(double M, double T, bool use_c, bool use_nf, double k1oT_min, double k1oT_max){
-
+double plot_disp(double T, double M, bool use_c, bool use_nf, double k1oT_min, double k1oT_max){
+	double init = k1oT_max*T;
 
         for(double k1oT = k1oT_max;k1oT > k1oT_min ; k1oT=k1oT-0.0101)
 	{	
+		
 		double k1 = k1oT*T;
-	        double found_k0 = dispSolved(T, M, k1, use_c, use_nf);
+	        double found_k0 = dispSolved(T, M, k1,init, use_c, use_nf);
 
         	std::cout<<fabs(k1oT)<<" "<<(found_k0-fabs(k1))/T<<std::endl;
+		init = found_k0;
 	}
 
 
